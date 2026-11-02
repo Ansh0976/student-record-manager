@@ -23,7 +23,9 @@ class ValidationError(ValueError):
 
 def validate_name(value: str) -> str:
     """Letters, spaces, apostrophes, hyphens and dots; 2-60 characters."""
-    name = " ".join(str(value).split())  # trim and collapse repeated spaces
+    if not isinstance(value, str):
+        raise ValidationError("Name must be text.")
+    name = " ".join(value.split())  # trim and collapse repeated spaces
     if not 2 <= len(name) <= 60:
         raise ValidationError("Name must be between 2 and 60 characters.")
     for ch in name:

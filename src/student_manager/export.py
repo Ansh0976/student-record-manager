@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import csv
-from typing import Iterable
+from typing import Iterable, TextIO
 
 from .database import Student
 
@@ -20,18 +20,23 @@ def _safe_cell(value: object) -> object:
     return "" if value is None else value
 
 
-def export_csv(students: Iterable[Student], path: str) -> int:
-    """Write students to a CSV file. Returns the number of rows written."""
+def write_csv(students: Iterable[Student], fileobj: TextIO) -> int:
+    """Write students as CSV to any open text file. Returns the row count."""
+    writer = csv.writer(fileobj)
+    writer.writerow(HEADER)
     count = 0
-    with open(path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(HEADER)
-        for s in students:
-            writer.writerow(
-                [
-                    _safe_cell(v)
-                    for v in (s.id, s.name, s.roll_number, s.grade, s.section, s.email, s.percentage)
-                ]
-            )
-            count += 1
+    for s in students:
+        writer.writerow(
+            [
+                _safe_cell(v)
+                for v in (s.id, s.name, s.roll_number, s.grade, s.section, s.email, s.percentage)
+            ]
+        )
+        count += 1
     return count
+
+
+def export_csv(students: Iterable[Student], path: str) -> int:
+    """Write students to a CSV file on disk. Returns the number of rows written."""
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        return write_csv(students, f)

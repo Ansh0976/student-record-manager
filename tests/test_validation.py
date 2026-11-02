@@ -24,6 +24,12 @@ class TestName:
         assert validate_name("Mary-Ann O'Neil Jr.") == "Mary-Ann O'Neil Jr."
 
 
+    def test_name_must_be_text(self):
+        for bad in (None, 5, ["Asha"]):
+            with pytest.raises(ValidationError):
+                validate_name(bad)
+
+
 class TestNumbers:
     def test_roll_number_ok(self):
         assert validate_roll_number(" 12 ") == 12
