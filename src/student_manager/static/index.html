@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student register</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f5c4d'/%3E%3Cpath d='M8 10h16M8 16h16M8 22h10' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f7f9;
+  --surface: #ffffff;
+  --ink: #16202e;
+  --muted: #5d6a7c;
+  --rule: #dde2ea;
+  --rule-strong: #c4ccd8;
+  --accent: #0f5c4d;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2f0ec;
+  --band: #eef2f5;
+  --danger: #b3261e;
+  --danger-soft: #fbe9e7;
+  --shadow: 0 12px 40px rgba(22, 32, 46, .18);
+  --font: "Schibsted Grotesk", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e151e; --surface: #151f2b; --ink: #e7ecf3; --muted: #93a1b4;
+    --rule: #263243; --rule-strong: #35455a; --accent: #4cc3a5; --accent-ink: #08241d;
+    --accent-soft: #15332d; --band: #111a25; --danger: #ff8a80; --danger-soft: #3a1d1b;
+    --shadow: 0 12px 40px rgba(0, 0, 0, .5); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e151e; --surface: #151f2b; --ink: #e7ecf3; --muted: #93a1b4;
+  --rule: #263243; --rule-strong: #35455a; --accent: #4cc3a5; --accent-ink: #08241d;
+  --accent-soft: #15332d; --band: #111a25; --danger: #ff8a80; --danger-soft: #3a1d1b;
+  --shadow: 0 12px 40px rgba(0, 0, 0, .5); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.page { max-width: 1040px; margin: 0 auto; padding: 40px 20px 80px; }
+
+/* Header */
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; }
+h1 { margin: 0; font-size: 2.1rem; line-height: 1.1; font-weight: 700; letter-spacing: -.02em; }
+.summary { margin: 8px 0 0; color: var(--muted); min-height: 1.5em; }
+.summary strong { color: var(--ink); font-weight: 600; }
+.head-actions { display: flex; gap: 10px; align-items: center; }
+
+/* Buttons and inputs */
+button, input, select { font: inherit; color: inherit; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--rule-strong); background: var(--surface); font-weight: 500;
+  transition: background .15s, border-color .15s;
+  color: var(--ink); text-decoration: none;
+}
+.btn:hover { background: var(--band); }
+.btn.primary, .btn.danger { text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; font-weight: 600; }
+.btn.danger:hover { background: var(--danger); filter: brightness(1.08); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 16px; }
+.field {
+  min-height: 40px; padding: 0 12px; border-radius: 8px; width: 100%;
+  border: 1px solid var(--rule-strong); background: var(--surface);
+}
+.field::placeholder { color: var(--muted); }
+.toolbar .search { flex: 1 1 260px; max-width: 420px; }
+.toolbar .grade { flex: 0 0 160px; width: 160px; }
+
+/* Register table */
+.register { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left; font-weight: 500; color: var(--muted); font-size: .875rem;
+  padding: 12px 16px; border-bottom: 1px solid var(--rule-strong); background: var(--surface);
+}
+th.num, td.num { text-align: right; }
+th.roll, td.roll { width: 72px; }
+th.marks, td.marks { width: 190px; }
+tbody td { padding: 12px 16px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+tbody tr.row:hover td { background: var(--band); }
+tbody tr.row:last-child td { border-bottom: 0; }
+tr.group th {
+  text-align: left; padding: 14px 16px 10px; background: var(--band);
+  border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule); font-weight: 400;
+}
+tr.group:first-child th { border-top: 0; }
+.group-name { font-weight: 700; font-size: 1.05rem; margin-right: 12px; }
+.group-meta { color: var(--muted); font-size: .9rem; }
+.name { font-weight: 600; }
+.sub { color: var(--muted); font-size: .875rem; }
+.mark { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.bar { width: 64px; height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.unset { color: var(--muted); }
+.actions { text-align: right; white-space: nowrap; }
+.link {
+  background: none; border: 0; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+  color: var(--accent); font-weight: 600;
+}
+.link:hover { background: var(--accent-soft); }
+.link.danger { color: var(--danger); }
+.link.danger:hover { background: var(--danger-soft); }
+
+.empty { padding: 56px 20px; text-align: center; color: var(--muted); }
+.empty p { margin: 0 0 16px; }
+
+/* Dialogs */
+dialog {
+  border: 1px solid var(--rule); border-radius: 14px; padding: 0; width: min(520px, calc(100vw - 32px));
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
+}
+dialog[open] { animation: pop .16s ease-out; }
+dialog::backdrop { background: rgba(10, 16, 24, .55); }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+.dlg { padding: 24px; }
+.dlg h2 { margin: 0 0 16px; font-size: 1.3rem; letter-spacing: -.01em; }
+.dlg p { margin: 0 0 20px; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.grid label { display: block; font-weight: 500; font-size: .9rem; }
+.grid label .field { margin-top: 6px; font-weight: 400; }
+.span6 { grid-column: span 6; } .span3 { grid-column: span 3; } .span2 { grid-column: span 2; }
+.hint { font-weight: 400; color: var(--muted); }
+.dlg .form-error {
+  margin: 20px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--danger-soft);
+  color: var(--danger); font-weight: 500;
+}
+.dlg .form-error[hidden] { display: none; }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0;
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px;
+  font-weight: 500; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 720px) {
+  .page { padding-top: 28px; }
+  h1 { font-size: 1.7rem; }
+  .col-email, .bar { display: none; }
+  thead th, tbody td { padding-left: 12px; padding-right: 12px; }
+  .span3, .span2 { grid-column: span 6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] { animation: none; }
+  .toast, .btn { transition: none; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="head">
+    <div>
+      <h1>Student register</h1>
+      <p class="summary" id="summary" aria-live="polite"></p>
+    </div>
+    <div class="head-actions">
+      <a class="btn" href="/api/export.csv" download>Export CSV</a>
+      <button class="btn primary" id="add-btn" type="button">Add student</button>
+    </div>
+  </header>
+
+  <div class="toolbar" role="search">
+    <input class="field search" id="q" type="search" placeholder="Search by name or email" aria-label="Search by name or email" autocomplete="off">
+    <select class="field grade" id="grade" aria-label="Filter by grade"></select>
+  </div>
+
+  <section class="register" aria-label="Students">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Student</th>
+          <th scope="col" class="num roll">Roll</th>
+          <th scope="col" class="num marks">Marks</th>
+          <th scope="col" class="col-email">Email</th>
+          <th scope="col"><span class="sr-only" style="position:absolute;left:-9999px">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden></div>
+  </section>
+</main>
+
+<dialog id="form-dlg" aria-labelledby="form-title">
+  <form class="dlg" id="form" method="dialog" novalidate>
+    <h2 id="form-title">Add student</h2>
+    <div class="grid">
+      <label class="span6">Full name
+        <input class="field" name="name" required maxlength="60" autocomplete="off">
+      </label>
+      <label class="span2">Roll number
+        <input class="field" name="roll_number" inputmode="numeric" required autocomplete="off">
+      </label>
+      <label class="span2">Grade <span class="hint">(1 to 12)</span>
+        <input class="field" name="grade" inputmode="numeric" required autocomplete="off">
+      </label>
+      <label class="span2">Section
+        <input class="field" name="section" maxlength="1" required autocomplete="off">
+      </label>
+      <label class="span3">Email <span class="hint">(optional)</span>
+        <input class="field" name="email" type="email" autocomplete="off">
+      </label>
+      <label class="span3">Marks, % <span class="hint">(optional)</span>
+        <input class="field" name="percentage" inputmode="decimal" autocomplete="off">
+      </label>
+    </div>
+    <p class="form-error" id="form-error" role="alert" hidden></p>
+    <div class="dlg-actions">
+      <button class="btn" type="button" id="form-cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="form-save">Add student</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="del-dlg" aria-labelledby="del-title">
+  <form class="dlg" method="dialog">
+    <h2 id="del-title">Delete student</h2>
+    <p id="del-text"></p>
+    <div class="dlg-actions">
+      <button class="btn" type="button" id="del-cancel">Keep student</button>
+      <button class="btn danger" type="button" id="del-confirm">Delete student</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+// All text from the server is inserted with textContent, never innerHTML,
+// so a stored name or email can never run as HTML or script.
+const $ = (sel) => document.querySelector(sel);
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
+
+async function api(url, options = {}) {
+  const res = await fetch(url, { headers: { "Content-Type": "application/json" }, ...options });
+  if (res.status === 204) return null;
+  let data = {};
+  try { data = await res.json(); } catch (_) { /* non-JSON error body */ }
+  if (!res.ok) throw new Error(data.error || "Something went wrong (" + res.status + ").");
+  return data;
+}
+
+const state = { students: [], q: "", grade: "", editingId: null, deleting: null };
+
+function toast(message) {
+  const t = $("#toast");
+  t.textContent = message;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+async function load() {
+  const params = new URLSearchParams();
+  if (state.q) params.set("q", state.q);
+  if (state.grade) params.set("grade", state.grade);
+  try {
+    state.students = await api("/api/students?" + params);
+    render();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+const PLURALS = { class: "classes" };
+function plural(n, word) {
+  return n + " " + (n === 1 ? word : (PLURALS[word] || word + "s"));
+}
+function avg(list) {
+  const marks = list.map((s) => s.percentage).filter((p) => p !== null);
+  return marks.length ? marks.reduce((a, b) => a + b, 0) / marks.length : null;
+}
+
+function renderSummary(list) {
+  const s = $("#summary");
+  s.textContent = "";
+  if (!list.length) return;
+  const classes = new Set(list.map((x) => x.grade + "-" + x.section)).size;
+  const a = avg(list);
+  s.append(el("strong", "", plural(list.length, "student")), " in " + plural(classes, "class"));
+  if (a !== null) s.append(", average mark " + a.toFixed(1) + "%");
+}
+
+function studentRow(s) {
+  const tr = el("tr", "row");
+  const who = el("td");
+  who.append(el("div", "name", s.name));
+  const meta = el("td", "num roll", String(s.roll_number));
+  const marks = el("td", "num marks");
+  const mark = el("div", "mark");
+  if (s.percentage === null) {
+    mark.append(el("span", "unset", "Not set"));
+  } else {
+    const bar = el("span", "bar");
+    const fill = el("span");
+    fill.style.width = Math.max(0, Math.min(100, s.percentage)) + "%";
+    bar.append(fill);
+    mark.append(bar, el("span", "", s.percentage.toFixed(1) + "%"));
+  }
+  marks.append(mark);
+  const email = el("td", "col-email sub", s.email || "");
+  const act = el("td", "actions");
+  const edit = el("button", "link", "Edit");
+  edit.type = "button";
+  edit.setAttribute("aria-label", "Edit " + s.name);
+  edit.addEventListener("click", () => openForm(s));
+  const del = el("button", "link danger", "Delete");
+  del.type = "button";
+  del.setAttribute("aria-label", "Delete " + s.name);
+  del.addEventListener("click", () => openDelete(s));
+  act.append(edit, del);
+  tr.append(who, meta, marks, email, act);
+  return tr;
+}
+
+function render() {
+  const list = state.students;
+  renderSummary(list);
+  const body = $("#rows");
+  body.textContent = "";
+  const empty = $("#empty");
+  empty.hidden = list.length > 0;
+  $("table").hidden = list.length === 0;
+  if (!list.length) {
+    empty.textContent = "";
+    const filtered = state.q || state.grade;
+    empty.append(el("p", "", filtered ? "No students match this search." : "No students yet. Add the first one."));
+    if (!filtered) {
+      const b = el("button", "btn primary", "Add student");
+      b.type = "button";
+      b.addEventListener("click", () => openForm(null));
+      empty.append(b);
+    }
+    return;
+  }
+  const groups = new Map();
+  for (const s of list) {
+    const key = s.grade + "-" + s.section;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(s);
+  }
+  for (const [key, members] of groups) {
+    const tr = el("tr", "group");
+    const th = el("th");
+    th.colSpan = 5;
+    th.append(el("span", "group-name", "Class " + key));
+    const a = avg(members);
+    th.append(el("span", "group-meta",
+      plural(members.length, "student") + (a !== null ? ", average " + a.toFixed(1) + "%" : "")));
+    tr.append(th);
+    body.append(tr);
+    members.forEach((s) => body.append(studentRow(s)));
+  }
+}
+
+/* Add / edit dialog */
+const formDlg = $("#form-dlg");
+const form = $("#form");
+function showFormError(msg) {
+  const e = $("#form-error");
+  e.textContent = msg || "";
+  e.hidden = !msg;
+}
+function openForm(student) {
+  state.editingId = student ? student.id : null;
+  form.reset();
+  showFormError("");
+  $("#form-title").textContent = student ? "Edit student" : "Add student";
+  $("#form-save").textContent = student ? "Save changes" : "Add student";
+  if (student) {
+    form.name.value = student.name;
+    form.roll_number.value = student.roll_number;
+    form.grade.value = student.grade;
+    form.section.value = student.section;
+    form.email.value = student.email || "";
+    form.percentage.value = student.percentage === null ? "" : student.percentage;
+  }
+  formDlg.showModal();
+  form.name.focus();
+}
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const payload = {};
+  for (const key of ["name", "roll_number", "grade", "section", "email", "percentage"]) {
+    payload[key] = form[key].value.trim();
+  }
+  const editing = state.editingId !== null;
+  try {
+    await api(editing ? "/api/students/" + state.editingId : "/api/students", {
+      method: editing ? "PUT" : "POST",
+      body: JSON.stringify(payload),
+    });
+    formDlg.close();
+    toast(editing ? "Changes saved" : "Student added");
+    load();
+  } catch (err) {
+    showFormError(err.message);
+  }
+});
+$("#form-cancel").addEventListener("click", () => formDlg.close());
+$("#add-btn").addEventListener("click", () => openForm(null));
+
+/* Delete dialog */
+const delDlg = $("#del-dlg");
+function openDelete(s) {
+  state.deleting = s;
+  $("#del-text").textContent =
+    "This permanently removes " + s.name + " (class " + s.grade + "-" + s.section + ", roll " + s.roll_number + ").";
+  delDlg.showModal();
+  $("#del-cancel").focus();
+}
+$("#del-cancel").addEventListener("click", () => delDlg.close());
+$("#del-confirm").addEventListener("click", async () => {
+  try {
+    await api("/api/students/" + state.deleting.id, { method: "DELETE" });
+    delDlg.close();
+    toast("Student deleted");
+    load();
+  } catch (err) {
+    delDlg.close();
+    toast(err.message);
+  }
+});
+
+/* Filters */
+const gradeSel = $("#grade");
+gradeSel.append(new Option("All grades", ""));
+for (let g = 1; g <= 12; g++) gradeSel.append(new Option("Grade " + g, String(g)));
+gradeSel.addEventListener("change", () => { state.grade = gradeSel.value; load(); });
+let debounce;
+$("#q").addEventListener("input", (e) => {
+  clearTimeout(debounce);
+  debounce = setTimeout(() => { state.q = e.target.value.trim(); load(); }, 200);
+});
+
+load();
+</script>
+</body>
+</html>

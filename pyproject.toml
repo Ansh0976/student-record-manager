@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "student-record-manager"
-version = "1.0.0"
-description = "SQLite-backed command-line manager for school student records."
+version = "1.1.0"
+description = "SQLite-backed manager for school student records, with a command line and a web interface."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
@@ -13,13 +13,17 @@ authors = [{ name = "Ansh Teepa" }]
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+web = ["flask>=3.0"]
+dev = ["pytest>=7", "flask>=3.0"]
 
 [project.scripts]
 student-manager = "student_manager.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+student_manager = ["static/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

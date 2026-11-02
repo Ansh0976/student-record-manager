@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sqlite3
 import sys
 from typing import List, Optional, Sequence
 
@@ -56,6 +57,10 @@ def build_parser() -> argparse.ArgumentParser:
     exp = sub.add_parser("export", help="export all students to CSV")
     exp.add_argument("path")
 
+    srv = sub.add_parser("serve", help="open the web interface in your browser")
+    srv.add_argument("--port", type=int, default=5000)
+    srv.add_argument("--host", default="127.0.0.1", help="default is this computer only")
+
     return parser
 
 
@@ -105,13 +110,37 @@ def _run(args: argparse.Namespace, repo: StudentRepository) -> int:
     return 0
 
 
+def _serve(args: argparse.Namespace) -> int:
+    try:
+        from .web import create_app
+    except ImportError:
+        print(
+            'The web interface needs Flask. Install it with: pip install -e ".[web]"',
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        StudentRepository(args.db).close()  # fail early with a clear message
+    except sqlite3.Error as err:
+        print(f"Cannot open database '{args.db}': {err}", file=sys.stderr)
+        return 1
+    print(f"Student register running at http://{args.host}:{args.port}  (Ctrl+C to stop)")
+    create_app(args.db).run(host=args.host, port=args.port, debug=False)
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "serve":
+        return _serve(args)
     try:
         with StudentRepository(args.db) as repo:
             return _run(args, repo)
     except (ValidationError, DuplicateStudentError, StudentNotFoundError, ValueError) as err:
         print(f"Error: {err}", file=sys.stderr)
+        return 1
+    except sqlite3.Error as err:
+        print(f"Database error: {err}", file=sys.stderr)
         return 1
     except OSError as err:
         print(f"File error: {err}", file=sys.stderr)

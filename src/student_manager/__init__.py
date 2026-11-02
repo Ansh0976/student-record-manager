@@ -1,3 +1,3 @@
-"""Student Record Manager: a small SQLite-backed CLI for school records."""
+"""Student Record Manager: SQLite-backed school records with a command line and web interface."""
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
